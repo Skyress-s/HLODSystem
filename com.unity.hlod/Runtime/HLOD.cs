@@ -117,6 +117,7 @@ namespace Unity.HLODSystem
 
         public SerializableDynamicObject SimplifierOptions
         {
+            set { m_SimplifierOptions = value; }
             get { return m_SimplifierOptions; }
         }
 

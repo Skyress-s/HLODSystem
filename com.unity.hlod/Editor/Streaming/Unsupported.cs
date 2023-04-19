@@ -12,7 +12,7 @@ using UnityEngine.Experimental.Rendering;
 
 namespace Unity.HLODSystem.Streaming
 {
-    class Unsupported : IStreamingBuilder
+    public class Unsupported : IStreamingBuilder
     {
         static class Styles
         {
@@ -58,21 +58,35 @@ namespace Unity.HLODSystem.Streaming
         }
 
         private IGeneratedResourceManager m_manager;
-        private SerializableDynamicObject m_streamingOptions;
+        private TextureFormat PCCompression;
+        private TextureFormat WebGLCompression;
+        private TextureFormat AndroidCompression;
+        private TextureFormat iOSCompression;
+        private TextureFormat tvOSCompression;
+        // private SerializableDynamicObject m_streamingOptions;
+        private string OutputDirectory;
         private int m_controllerID;
 
-        public Unsupported(IGeneratedResourceManager manager, int controllerID, SerializableDynamicObject streamingOptions)
-        {
+        public Unsupported(IGeneratedResourceManager manager, int controllerID/*, SerializableDynamicObject streamingOptions*/){
+            
+            PCCompression = TextureFormat.BC7;
+            WebGLCompression = TextureFormat.DXT5;
+            AndroidCompression = TextureFormat.ETC2_RGB;
+            iOSCompression = TextureFormat.PVRTC_RGBA4;
+            tvOSCompression = TextureFormat.ASTC_4x4;
             m_manager = manager;
-            m_streamingOptions = streamingOptions;
+            // m_streamingOptions = streamingOptions;
             m_controllerID = controllerID;
+            
+            OutputDirectory = "Assets/Bingus/";
         }
 
         public void Build(SpaceNode rootNode, DisposableList<HLODBuildInfo> infos, GameObject root, 
             float cullDistance, float lodDistance, bool writeNoPrefab, bool extractMaterial, Action<float> onProgress)
         {
-            dynamic options = m_streamingOptions;
-            string path = options.OutputDirectory;
+            // dynamic options = m_streamingOptions;
+            string path = OutputDirectory;
+            // path = "Assets/Bingus/";
 
             HLODTreeNodeContainer container = new HLODTreeNodeContainer();
             HLODTreeNode convertedRootNode = ConvertNode(container, rootNode);
@@ -81,11 +95,11 @@ namespace Unity.HLODSystem.Streaming
                 onProgress(0.0f);
 
             HLODData.TextureCompressionData compressionData;
-            compressionData.PCTextureFormat = options.PCCompression;
-            compressionData.WebGLTextureFormat = options.WebGLCompression;
-            compressionData.AndroidTextureFormat = options.AndroidCompression;
-            compressionData.iOSTextureFormat = options.iOSCompression;
-            compressionData.tvOSTextureFormat = options.tvOSCompression;
+            compressionData.PCTextureFormat = PCCompression;
+            compressionData.WebGLTextureFormat = WebGLCompression;
+            compressionData.AndroidTextureFormat = AndroidCompression;
+            compressionData.iOSTextureFormat = iOSCompression;
+            compressionData.tvOSTextureFormat = tvOSCompression;
             
             string filename = $"{path}{root.name}.hlod";
 

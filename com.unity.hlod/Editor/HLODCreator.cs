@@ -18,7 +18,7 @@ namespace Unity.HLODSystem
 {
     public static class HLODCreator
     {
-        private static List<Collider> GetColliders(List<GameObject> gameObjects, float minObjectSize)
+        public static List<Collider> GetColliders(List<GameObject> gameObjects, float minObjectSize)
         {
             List<Collider> results = new List<Collider>();
 
@@ -41,7 +41,7 @@ namespace Unity.HLODSystem
             return results;
         }
 
-        private struct TravelQueueItem
+        public struct TravelQueueItem
         {
             public SpaceNode Node;
             public int Parent;
@@ -51,7 +51,7 @@ namespace Unity.HLODSystem
             public List<int> Distances;
         }
 
-        private static void CopyObjectsToParent(List<TravelQueueItem> list, int curIndex, List<GameObject> objects, int distance)
+        public static void CopyObjectsToParent(List<TravelQueueItem> list, int curIndex, List<GameObject> objects, int distance)
         {
             if (curIndex < 0)
                 return;
@@ -69,7 +69,7 @@ namespace Unity.HLODSystem
             CopyObjectsToParent(list, parentIndex, objects, distance + 1);
 
         }
-        private static DisposableList<HLODBuildInfo> CreateBuildInfo(HLOD hlod, SpaceNode root, float minObjectSize)
+        public static DisposableList<HLODBuildInfo> CreateBuildInfo(HLOD hlod, SpaceNode root, float minObjectSize)
         {
             //List<HLODBuildInfo> resultsCandidates = new List<HLODBuildInfo>();
             
@@ -235,9 +235,11 @@ namespace Unity.HLODSystem
                         Debug.Log("[HLOD] Splite space: " + sw.Elapsed.ToString("g"));
                         sw.Reset();
                         sw.Start();
-
-                        ISimplifier simplifier = (ISimplifier)Activator.CreateInstance(hlod.SimplifierType,
-                            new object[] { hlod.SimplifierOptions });
+                        
+                        // ISimplifier simplifier = (ISimplifier)Activator.CreateInstance(hlod.SimplifierType,
+                        //     new object[] { hlod.SimplifierOptions });
+                        
+                        ISimplifier simplifier = new Unity.HLODSystem.Simplifier.UnityMeshSimplifier(300, 1, 0.8f);
                         for (int i = 0; i < buildInfos.Count; ++i)
                         {
                             yield return new BranchCoroutine(simplifier.Simplify(buildInfos[i]));
@@ -253,9 +255,10 @@ namespace Unity.HLODSystem
                         sw.Start();
 
 
-                        using (IBatcher batcher =
-                               (IBatcher)Activator.CreateInstance(hlod.BatcherType,
-                                   new object[] { hlod.BatcherOptions }))
+                        // using (IBatcher batcher =
+                        //        (IBatcher)Activator.CreateInstance(hlod.BatcherType,
+                        //            new object[] { hlod.BatcherOptions }))
+                        using (IBatcher batcher = new MaterialPreservingBatcher())
                         {
                             batcher.Batch(hlod.transform, buildInfos,
                                 progress =>
@@ -281,9 +284,9 @@ namespace Unity.HLODSystem
                             targetGameObject = newTargetGameObject;
                         }
 
-                        IStreamingBuilder builder =
-                            (IStreamingBuilder)Activator.CreateInstance(hlod.StreamingType,
-                                new object[] { hlod, ri, hlod.StreamingOptions });
+                        IStreamingBuilder builder = new Unity.HLODSystem.Streaming.Unsupported(hlod, ri);
+                            // (IStreamingBuilder)Activator.CreateInstance(hlod.StreamingType,
+                            //     new object[] { hlod, ri, hlod.StreamingOptions });
                         builder.Build(rootNode, buildInfos, targetGameObject, hlod.CullDistance, hlod.LODDistance, false,
                             true,
                             progress =>

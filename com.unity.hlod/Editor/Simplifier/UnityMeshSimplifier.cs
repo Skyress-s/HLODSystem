@@ -9,14 +9,15 @@ namespace Unity.HLODSystem.Simplifier
 {
     public class UnityMeshSimplifier : SimplifierBase
     {
-
+        
         [InitializeOnLoadMethod]
         static void RegisterType()
         {
             SimplifierTypes.RegisterType(typeof(UnityMeshSimplifier));
         }
 
-        public UnityMeshSimplifier(SerializableDynamicObject simplifierOptions): base(simplifierOptions)
+        public UnityMeshSimplifier(int simplifyMaxPolygonCount, int simplifyMinPolygonCount, float simplifyPolygonRatio): 
+            base(simplifyMaxPolygonCount, simplifyMinPolygonCount, simplifyPolygonRatio)
         {
         }
 

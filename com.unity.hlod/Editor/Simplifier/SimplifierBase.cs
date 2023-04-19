@@ -10,10 +10,15 @@ namespace Unity.HLODSystem.Simplifier
 {
     public abstract class SimplifierBase : ISimplifier
     {
-        private dynamic m_options;
-        public SimplifierBase(SerializableDynamicObject simplifierOptions)
+        // private dynamic m_options;
+        private int SimplifyMaxPolygonCount;
+        private int SimplifyMinPolygonCount;
+        private float SimplifyPolygonRatio;
+        public SimplifierBase(int simplifyMaxPolygonCount, int simplifyMinPolygonCount, float simplifyPolygonRatio)
         {
-            m_options = simplifierOptions;
+            SimplifyMaxPolygonCount = simplifyMaxPolygonCount;
+            SimplifyMinPolygonCount = simplifyMinPolygonCount;
+            SimplifyPolygonRatio = simplifyPolygonRatio;
         }
         public IEnumerator Simplify(HLODBuildInfo buildInfo)
         {
@@ -22,10 +27,10 @@ namespace Unity.HLODSystem.Simplifier
                 Utils.WorkingMesh mesh = buildInfo.WorkingObjects[i].Mesh;
 
                 int triangleCount = mesh.triangles.Length / 3;
-                float maxQuality = Mathf.Min((float)m_options.SimplifyMaxPolygonCount / (float)triangleCount, (float)m_options.SimplifyPolygonRatio);
-                float minQuality = Mathf.Max((float)m_options.SimplifyMinPolygonCount / (float)triangleCount, 0.0f);
+                float maxQuality = Mathf.Min((float)SimplifyMaxPolygonCount / (float)triangleCount, (float)SimplifyPolygonRatio);
+                float minQuality = Mathf.Max((float)SimplifyMinPolygonCount / (float)triangleCount, 0.0f);
 
-                var ratio = maxQuality * Mathf.Pow((float)m_options.SimplifyPolygonRatio, buildInfo.Distances[i]);
+                var ratio = maxQuality * Mathf.Pow((float)SimplifyPolygonRatio, buildInfo.Distances[i]);
                 ratio = Mathf.Max(ratio, minQuality);
 
                 
