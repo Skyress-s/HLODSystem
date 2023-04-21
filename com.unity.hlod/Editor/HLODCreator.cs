@@ -237,14 +237,14 @@ namespace Unity.HLODSystem
                         sw.Start();
                         
                         // ISimplifier simplifier = (ISimplifier)Activator.CreateInstance(hlod.SimplifierType,
-                        //     new object[] { hlod.SimplifierOptions });
+                        // new object[] { hlod.SimplifierOptions });
                         
                         ISimplifier simplifier = new Unity.HLODSystem.Simplifier.UnityMeshSimplifier(300, 1, 0.8f);
                         for (int i = 0; i < buildInfos.Count; ++i)
                         {
                             yield return new BranchCoroutine(simplifier.Simplify(buildInfos[i]));
                         }
-
+                        
                         yield return new WaitForBranches(progress =>
                         {
                             EditorUtility.DisplayProgressBar("Bake HLOD", "Simplify meshes",
